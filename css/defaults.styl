@@ -1,0 +1,170 @@
+*
+  margin 0
+  padding 0
+  border none
+  background-origin content-box
+
+*, *:after, *:before
+  vendor(box-sizing, border-box)
+
+a
+  text-decoration none
+
+ul
+  list-style none
+
+body
+  background-color #ffffff
+  font-size 16px
+  font-family 'Open Sans', Helvetica, sans-serif
+  border-top 18px solid #f7f8f2
+
+.container
+  max-width 960 px
+  width 100%
+  margin auto
+  position relative
+
+//Grid System
+gridQ = 12
+gridPercentage(gridBlocksQ)
+  width ((gridBlocksQ/gridQ) * 100) %
+
+.grid
+  width 100%
+
+.grid:after
+  content ''
+  display table
+  clear both
+
+for i in (1..gridQ)
+  .col_{i}
+    display block
+    float left
+
+for i in (1..gridQ)
+  .col_{i}
+    gridPercentage(i)
+
+.grid_pad
+  padding 1.5em 0 1.5em 1.5em
+
+[class*='col_']
+  padding-right 1.5em
+
+[class*='col_']:last-child
+  padding-right 0
+
+@media (max-width: 980px)
+  .md-hidden
+    display none
+
+@media (max-width: 680px)
+  .sm-col-1
+    width 100%!important
+  .sm-hidden
+    display none
+    height 0!important
+
+
+
+/* NavBar Styles */
+
+#mobileMenuBtn
+  display none
+
+#mainNav
+  text-align right
+  position absolute
+  top 50%
+  right 0
+  font-size 1rem
+  margin-top -0.5em
+  background white
+
+#mainNav li
+  display inline-block
+  position relative
+  min-width 40px
+  margin 0 12px
+  text-align center
+  cursor pointer
+  color #000000
+
+#mainNav li a,
+#mainNav .mainLvl
+  display block
+  color #000000
+
+#mainNav li:hover, #mainNav .current_page_item
+  box-shadow 0 3px 0 0 #ff004e
+
+#mainNav .mainLvl:hover .subLvl
+  display block
+
+#mainNav .subLvl 
+  position absolute
+  display none
+  background-color #0c070e
+  top 91px
+  left 0
+
+#mainNav .subLvl li 
+  width 100%
+
+#mainNav .subLvl li a
+  display block
+  width 100%
+  padding 12px 0
+  font-size 0.82em
+
+.fadeIn, .fastFadeIn
+  opacity 0
+  vendor(animation,fadeIn ease-in 1)
+  vendor(animation-fill-mode, forwards)
+  vendor(animation-duration, 2s)
+
+.fastFadeIn
+  vendor(animation-duration, 0.5s)
+
+@-webkit-keyframes fadeIn
+  from
+    opacity 0
+  to
+    opacity 1
+
+@-moz-keyframes fadeIn
+  from
+    opacity 0
+  to
+    opacity 1
+
+@keyframes fadeIn
+  from
+    opacity 0
+  to
+    opacity 1
+
+.ease
+  vendor('transition', all 0.5s ease)
+
+/* PageNavi */
+
+.pageNavi
+  width 100%
+  position relative
+  margin-top 10px
+  text-align center
+
+.pageNavi li, .backToList
+  display inline-block
+  padding 4px 9px
+  margin 3px
+  border-radius(4px)
+  background-color customMagenta
+  color #fff
+  cursor pointer
+
+.selectedNav
+  background-color wine!important

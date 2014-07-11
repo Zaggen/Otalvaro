@@ -1,0 +1,31 @@
+vendor(prop, args)
+  -webkit-{prop} args
+  -moz-{prop} args
+  -o-{prop} args
+  -ms-{prop} args
+  {prop} args
+
+transition()
+  vendor(transition, arguments)
+
+user-select(value)
+  vendor(user-select, value)
+
+border-radius(amount)
+  vendor(border-radius, amount)
+
+border-top-radius(amount)
+  vendor(border-top-left-radius, amount)
+  vendor(border-top-right-radius, amount)
+
+border-bottom-radius(amount)
+  vendor(border-bottom-left-radius, amount)
+  vendor(border-bottom-right-radius, amount)
+
+border-left-radius(amount)
+  vendor(border-top-left-radius, amount)
+  vendor(border-bottom-left-radius, amount)
+
+border-right-radius(amount)
+  vendor(border-top-right-radius, amount)
+  vendor(border-bottom-right-radius, amount)

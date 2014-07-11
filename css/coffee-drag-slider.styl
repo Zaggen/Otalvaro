@@ -1,0 +1,112 @@
+/* Slider Styles */
+.sliderViewport *
+  margin:0
+  padding 0
+
+.sliderViewport
+  width 100%
+  height 600px
+  min-height inherit
+  position relative
+  overflow hidden
+  -webkit-transform-origin 0px 0px
+  -webkit-transform scale(1)
+  background-origin content-box
+  background black url("../imgs/slider-bg.jpg") no-repeat fixed top center
+  box-shadow inset 0 0 15px rgb(0, 0, 0)
+
+.onLeftLimit:after,
+.onRightLimit:after
+  content ''
+  display block
+  width 0
+  max-width 2px
+  height 100%
+  position absolute
+  top 0
+  bottom 0
+  box-shadow 0px 0 5px 3px #ff004e
+
+.onLeftLimit:after
+  left 0
+
+.onRightLimit:after
+  right 0
+
+.sliderViewport .slider
+  position relative
+  min-width 100%
+  height auto
+  overflow hidden
+  margin-left 0
+  top 0
+  left 0
+
+.sliderViewport .slider > li
+  display block
+  position relative
+  width 100%
+  /*height auto*/
+  height 100%
+  float left
+  overflow hidden
+
+.sliderImg
+  width 100%
+  display block
+  height auto
+  min-height 55%
+
+.sliderBtn
+  display block
+  position absolute
+  top 50%
+  margin-top -74px
+  cursor pointer
+  z-index 999
+  font-size 154px
+  color #ff004e
+
+.prevBtn
+  left 19%
+
+.nextBtn
+  right 19%
+
+.navigator
+  width 100%
+  position absolute
+  bottom 0px
+  text-align center
+
+.navigator .navBullet
+  display inline-block
+  width 14px
+  height 14px
+  background-color white
+  margin 0px 2px 1.5%
+  cursor pointer
+  box-shadow 0 0 6px rgba(0,0,0,0.55) inset
+  border-radius(56px)
+  /*border 2px solid white*/
+
+
+.navigator .selectedBullet
+  background-color #ff004e !important
+
+
+/* Custom slider styles */
+.sliderViewport img
+  position absolute
+  display block
+  max-width 89%
+  max-height 80%
+  /*margin 2% auto 0*/
+  top 50%
+  left 50%
+  border 6px solid rgba(255, 255, 255, 0.03)
+  border-radius 4px
+
+
+
+/* End slider styles */
