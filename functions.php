@@ -50,13 +50,11 @@ function getGalleryThumbsArr($galleryIdString, $thumbSize = 'small') {
 }
 
 
-function getStylesheetUri()
-{
+function getStylesheetUri() {
     return get_stylesheet_directory_uri() . '/';
 }
 
-function stylesheetUri()
-{
+function stylesheetUri() {
     echo getStylesheetUri();
 }
 
@@ -66,40 +64,34 @@ function getThumbUrlArr($thumbnailSize = 'small') {
     return $thumbUrl;
 }
 
-function getThumbUrl($thumbnailSize = 'small')
-{
+function getThumbUrl($thumbnailSize = 'small') {
     $thumbUrl = getThumbUrlArr($thumbnailSize);
     return $thumbUrl[0];
 }
 
-function getRoute()
-{
+function getRoute() {
     $link = rtrim(get_permalink(), '/'); # We remove the last trailing slash
     return removeBaseUrl($link);
 }
 
 # Removes the site base url from the link, useful in our backbone routes, we can't use full urls but paths :)
-function removeBaseUrl($permalink)
-{
+function removeBaseUrl($permalink) {
     return str_replace(get_site_url(), '', $permalink);
 }
 
 
-function getYtEmbedUrl($ytLink)
-{
+function getYtEmbedUrl($ytLink) {
     $search = '#(.*?)(?:href="https?://)?(?:www\.)?(?:youtu\.be/|youtube\.com(?:/embed/|/v/|/watch?.*?v=))([\w\-]{10,12}).*#x';
     $replace = 'http://www.youtube.com/embed/$2';
     return preg_replace($search, $replace, $ytLink);
 }
 
-function getYtThumb($ytLink)
-{
+function getYtThumb($ytLink) {
     parse_str(parse_url($ytLink, PHP_URL_QUERY), $urlSegments);
     return "http://img.youtube.com/vi/{$urlSegments['v']}/2.jpg";
 }
 
-function placeTemplate($templateName, $data = array(), $args = array())
-{
+function placeTemplate($templateName, $data = array(), $args = array()) {
     $templatePath = 'templates/' . $templateName . '.php';
     return include($templatePath);
 }
@@ -118,7 +110,7 @@ function theSectionDesc($pageSlug) {
 /*
  * @return array|false
  */
-function getGallery()
+function getGallery($conf = array())
 {
     /***
      *  Splits the ids from the shortCode placed in the content of a post, and gets the
@@ -128,27 +120,46 @@ function getGallery()
      *
      ***/
 
-    $imgs = array();
-    $idsFromGallery = preg_replace('/[^0-9\,]/', '', get_the_content());
+    $imgPerPage = $conf['imgPerPage'] ?: 10;
+    $page = $conf['page'] ?: 1; # The page Number to retrieve
+    $thumbSize = $conf['thumbSize'] ?: 'galleryThumb';
+    $fullSize = $conf['fullSize'] ?: 'fullPic';
+
+    $gallery = array(
+        'meta' => array(
+            'imgQ' => 0,
+            'pagesQ' => 1
+        ),
+        'galleryItems' => array()
+    );
+
+    $content = get_the_content();
+    if(empty($content))
+        return false;
+
+    $idsFromGallery = preg_replace('/[^0-9\,]/', '', $content);
     $imgIds = explode(',', $idsFromGallery);
+
+    $startRange = ($page * $imgPerPage) - $imgPerPage;
+
+    $imgIds = array_splice($imgIds, $startRange, $imgPerPage);
 
     if (count($imgIds) > 0) {
 
         foreach ($imgIds as $id) {
             $meta = getAttachmentData($id);
-            /*echo '<pre>';
-            print_r($meta);
-            echo '</pre>';*/
-            $thumbUrl = wp_get_attachment_image_src($id, 'galleryThumb');
-            $fullSizeUrl = wp_get_attachment_image_src($id, 'fullPic');
-            $imgs[] = array(
+            $thumbUrl = wp_get_attachment_image_src($id, $thumbSize);
+            $fullSizeUrl = wp_get_attachment_image_src($id, $fullSize);
+            $gallery['galleryItems'][] = array(
                 'title' => $meta['title'],
                 'description' => $meta['description'],
                 'thumbnail' => $thumbUrl[0],
                 'fullImg' => $fullSizeUrl[0]
             );
+
         }
-        return $imgs;
+
+        return $gallery;
     } else {
         return false;
     }
@@ -555,15 +566,17 @@ function bt_image_resize($file, $max_w, $max_h, $crop = false, $suffix = null, $
     return $destfilename;
 }
 
+## Used by bio.php
 bt_add_image_size('bioThumb', 216, 216, array('center', 'top'));
+
+## Used by gallery.php (fotos/videos)
+bt_add_image_size('galleryThumb', 140, 140, array('center', 'top'));
+bt_add_image_size('fullPic', 800, 800, array('center', 'top'));
 
 /*bt_add_image_size('mainSlider', 940, 325, array('center', 'top'));
 bt_add_image_size('bioThumbs', 256, 193, array('center', 'top'));
 bt_add_image_size('homeFeed', 169, 169, array('center', 'top'));
 
-## Used by gallery-section.php
-bt_add_image_size('galleryThumb', 237, 236, array('center', 'top'));
-bt_add_image_size('fullPic', 800, 800, array('center', 'top'));
 
 ## Used by blog-section.php and news-section.php
 bt_add_image_size('blogExcerpt', 182, 166, array('center', 'top'));
