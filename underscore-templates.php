@@ -38,8 +38,8 @@
 <script id="galleryTemplate" type="text/x-handlebars-template">
     <h2 class="navCrumb bioCrumb">Fotos  <i class="fa fa-camera"></i> </h2>
     <ul class="gallery">
-        {{#each images}}
-            <li><img src="{{this}} "/></li>
+        {{#each galleryItems}}
+            <li><a href="{{this.fullImg}}" title="{{this.title}}"><img src="{{this.thumbnail}} "/></a></li>
         {{/each}}
     </ul>
     <ul id="newsNavi" class="pageNavi">
