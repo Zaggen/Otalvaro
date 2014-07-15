@@ -15,7 +15,7 @@ query_posts(array('post_type' => 'post'));
 if(have_posts()):
     while(have_posts()): the_post();
         $rating = 5;
-        $permalink = get_the_permalink();
+        $permalink = get_permalink();
 
         $thumbId = get_post_thumbnail_id();
         $thumbUrlArray = wp_get_attachment_image_src($thumbId, 'bioThumb', true);
