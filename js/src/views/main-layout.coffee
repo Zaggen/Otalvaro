@@ -15,18 +15,27 @@ class Otalvaro.Views.MainLayOut extends Backbone.View
     @$el.removeClass('fastFadeOut')
         .addClass('fastFadeIn')
 
+  ###
+  # Takes an array containing one or more view instance as argument, adds a fadeOut fx to hide the current content
+  # then it renders each view instance from the array and extracts its node element (el) and pushes it into an array
+  # that is later (after the fadeIn completes) added as the html content of the layoutView
+  ###
   show: (views)->
     if not @firstLoad
-      @$el.empty()
+      @fadeOut()
+      delay = 500 # Based on the .fastFadeIn and .fastFadeOut duration, changes must be made in the classes and here to alter the delay
       viewNodes = []
       for view in views
         node =  view.render().el
         viewNodes.push(node)
+      _.delay(
+        _.bind ->
+          console.log viewNodes
+          @$el.html(viewNodes)
+          @fadeIn()
+        , this
+      delay)
 
-      console.log viewNodes
-      @fadeOut()
-      @$el.append(viewNodes)
-      _.defer(_.bind(@fadeIn, this))
       this
     else
       @firstLoad = no
