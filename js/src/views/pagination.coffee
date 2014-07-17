@@ -3,24 +3,42 @@ Otalvaro = root.Otalvaro
 
 # Pagination View
 
-class Otalvaro.Views.pagination extends  Backbone.View
-  className: '.pageNavi',
-  tagName: 'ul'
+class Otalvaro.Views.Pagination extends  Backbone.View
+  className: 'pageNavi',
+  tagName: 'ul',
+  events:
+    'click li': 'changePage'
 
   initialize: (options)->
-    @feed = options.collectionView
-    @pageQ = parseInt @$el.attr('data-page-quantity')
-    @setCurrentPageNum(1)
 
-  setCurrentPageNum:(currentPageNum) ->
-    @currentPageNum = parseInt(currentPageNum)
-    @render(renderedView)
+    if $(options.elementId)[0]?
+      @setElement(options.elementId)
 
-  updatePage: (currentPageNum) ->
-    @setCurrentPageNum(currentPageNum)
-    @feed.fetchCollection(currentPageNum)
+    @collection = options.collection
+    @url = options.url
+    @pageQ = 3 #parseInt @$el.attr('data-page-quantity')
+    @pageQ ?= @pageQ
+    @currentPageNum = 1
+    @render()
+
+  updatePage: () ->
+    @collection.fetchPage(@currentPageNum)
+    @updateRoute()
+
+  updateRoute: ->
+    route = @url + '/' + @currentPageNum;
+    Backbone.history.navigate(route)
+    null
+
+  changePage: (e)=>
+    $('.navBtns').removeClass('selectedNav')
+    @currentPageNum = $(e.currentTarget).text()
+    @updatePage()
+    $(e.currentTarget).addClass('selectedNav')
+    null
 
   render: ->
+    console.log 'rendering navi'
     # Renders the pagination list e.g : 1 - 2 - 3 ... 8 , probably should be refactored into smaller functions
     nodes = []
     btnsLimit = 4
@@ -44,12 +62,12 @@ class Otalvaro.Views.pagination extends  Backbone.View
     maxRange = selectedPage + rightHalf
     skipped = no
 
-
     for num in [1..@pageQ]
+
       if num is 1 or minRange <= num <= maxRange or num is @pageQ
-        liItem = new Otalvaro.Views.pageBtn
+        liItem = new Otalvaro.Views.naviItem
           pageNum : num
-          className: if num is selectedPage then 'navBtns selectedNav' else 'navBtns'
+          className: if num is selectedPage then 'navBtns pageBtn selectedNav' else 'navBtns pageBtn'
           parentInstance: this
         skipped = no
       else
@@ -60,9 +78,10 @@ class Otalvaro.Views.pagination extends  Backbone.View
 
           skipped = yes
 
+      nodes.push liItem.render().el
 
-      nodes.push liItem.render(renderedView).el
     @$el.html nodes
+    @delegateEvents();
     this
 
 class Otalvaro.Views.naviItem extends Backbone.View
@@ -75,34 +94,6 @@ class Otalvaro.Views.naviItem extends Backbone.View
   render: ->
     @$el.text @pageNum
     this
-
-
-
-class Otalvaro.Views.pageBtn extends Otalvaro.Views.naviItem
-  events:
-    'click': 'changePage'
-
-  initialize: (options)->
-    super
-    @navi = options.parentInstance
-
-  changePage: (e)=>
-    @$navBtns = $('.navBtns')
-    @crntPage = $(e.currentTarget).text()
-    $('body').css 'cursor','wait'
-
-    @navi.updatePage(@crntPage)
-    @updateRoute()
-    null
-
-  updateRoute: ->
-    route = 'noticias/pagina/' + @crntPage;
-    Backbone.history.navigate(route)
-    null
-
-
-
-# Return to News List Btn
 
 
 class Otalvaro.Views.ReturnToListBtn extends Backbone.View
