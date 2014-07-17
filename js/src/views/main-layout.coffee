@@ -7,22 +7,26 @@ class Otalvaro.Views.MainLayOut extends Backbone.View
   initialize: ->
     @firstLoad = yes # There is no need to update on first load, so we check using this variable
 
-  update: (view)->
-    if not @firstLoad
-      @$el
-        .removeClass('fastFadeIn')
+  fadeOut: ->
+    @$el.removeClass('fastFadeIn')
         .addClass('fastFadeOut')
-        .empty()
-      view = view.setView(
-        (renderedView)=>
-          @render(renderedView)
-      )
+
+  fadeIn: ->
+    @$el.removeClass('fastFadeOut')
+        .addClass('fastFadeIn')
+
+  show: (views)->
+    if not @firstLoad
+      @$el.empty()
+      viewNodes = []
+      for view in views
+        node =  view.render().el
+        viewNodes.push(node)
+
+      console.log viewNodes
+      @fadeOut()
+      @$el.append(viewNodes)
+      _.defer(_.bind(@fadeIn, this))
+      this
     else
       @firstLoad = no
-
-  render: (view)->
-    @$el
-      .removeClass('fastFadeOut')
-      .addClass('fastFadeIn')
-      .append view
-    this
