@@ -6,14 +6,23 @@ class Otalvaro.Views.MainLayOut extends Backbone.View
 
   initialize: ->
     @firstLoad = yes # There is no need to update on first load, so we check using this variable
+    @fadeInClass = 'fastFadeIn'
+    @fadeOutClass = 'fastFadeOut'
 
   fadeOut: ->
-    @$el.removeClass('fastFadeIn')
-        .addClass('fastFadeOut')
+    @$el.removeClass(@fadeInClass)
+        .addClass(@fadeOutClass)
 
   fadeIn: ->
-    @$el.removeClass('fastFadeOut')
-        .addClass('fastFadeIn')
+    @$el.removeClass(@fadeOutClass)
+        .addClass(@fadeInClass)
+
+  closeOldViews: ->
+    if @oldViews?
+      console.log 'clearing old views innerHtml'
+      for view in @oldViews
+        console.log view
+        view.close()
 
   ###
   # Takes an array containing one or more view instance as argument, adds a fadeOut fx to hide the current content
@@ -30,11 +39,12 @@ class Otalvaro.Views.MainLayOut extends Backbone.View
         viewNodes.push(node)
       _.delay(
         _.bind ->
-          console.log viewNodes
+          @closeOldViews()
           @$el.html(viewNodes)
           @fadeIn()
         , this
       delay)
+      @oldViews = views
 
       this
     else
