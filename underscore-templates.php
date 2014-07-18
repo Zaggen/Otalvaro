@@ -42,27 +42,12 @@
             <li><a href="{{this.fullImg}}" title="{{this.title}}"><img src="{{this.thumbnail}} "/></a></li>
         {{/each}}
     </ul>
-    <ul id="newsNavi" class="pageNavi">
-        <li class="navBtns selectedNav">1</li>
-        <li class="navBtns">2</li>
-        <li class="navBtns">3</li>
-        <li class="navBtns">4</li>
-    </ul>
-</script>
+ </script>
 
 <script id="blogTemplate" type="text/x-handlebars-template">
     <h2 class="navCrumb bioCrumb">Blog
         <i class="fa fa-book"></i>
     </h2>
-    {{#each list}}
-        {{this}}
-    {{/each}}
-    <ul id="newsNavi" class="pageNavi">
-        <li class="navBtns selectedNav">1</li>
-        <li class="navBtns">2</li>
-        <li class="navBtns">3</li>
-        <li class="navBtns">4</li>
-    </ul>
 </script>
 
 <script id="blogEntryTemplate" type="text/x-handlebars-template">
