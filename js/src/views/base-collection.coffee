@@ -27,7 +27,7 @@ class Otalvaro.Views.CompositeView extends Otalvaro.Views.CollectionView
 
   initialize: (options)->
     super
-    @collectionViewTag = options.collectionViewTag ? 'ul'
+    @querySelector = options.querySelector ? 'ul'
 
   render: ->
     console.log 'collection', @collection
@@ -37,9 +37,8 @@ class Otalvaro.Views.CompositeView extends Otalvaro.Views.CollectionView
       @collection.fetchPage(1)
     else
       console.log 'collection fetched, now rendering'
-      collectionView = @$el.find(@collectionViewTag)
+      collectionView = @$el.find(@querySelector)
       nodes = @renderCollectionNodes()
-      console.log nodes
       collectionView.html(nodes)
 
     @delegateEvents();
