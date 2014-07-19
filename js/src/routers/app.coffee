@@ -15,25 +15,22 @@ class Otalvaro.Routers.Router extends Backbone.Router
     @mainLayout = new Otalvaro.Views.MainLayOut
 
     # Home
-    homeModel = new Otalvaro.Models.Home
-    @homeView = new Otalvaro.Views.Home( model: homeModel )
+    @homeModel = new Otalvaro.Models.Home
 
     # Bio
-    bioModel = new Otalvaro.Models.Bio
-    @bioView = new Otalvaro.Views.Bio( model: bioModel )
+    @bioModel = new Otalvaro.Models.Bio
 
     # Blog
-    blogCollection = new Otalvaro.Collections.Blog
-    blogCollectionView = new Otalvaro.Views.BlogCollection
-      itemViewClass: Otalvaro.Views.BlogEntry
-      collection: blogCollection
-
-    @blogView = new Otalvaro.Views.Blog( itemView: blogCollectionView)
-
+    @blogCollection = new Otalvaro.Collections.Blog
+    @blogNavi = new Otalvaro.Views.Pagination
+      elementId: '#blogNavi'
+      collection: @blogCollection
 
     # Gallery
-    galleryModel = new Otalvaro.Models.Gallery
-    @galleryView = new Otalvaro.Views.Gallery( model: galleryModel )
+    @galleryCollection = new Otalvaro.Collections.Gallery
+    @galleryNavi = new Otalvaro.Views.Pagination
+      elementId: '#galNavi'
+      collection: @galleryCollection
 
     baseFolder = window.location.pathname.replace('/','').split('/')[0]
     Backbone.history.start
@@ -51,21 +48,31 @@ class Otalvaro.Routers.Router extends Backbone.Router
   # offset of an element which id matches the current route
 
   home:->
+    homeView = new Otalvaro.Views.Home( model: @homeModel )
     @sliderCover.expand()
-    @mainLayout.update(@homeView)
+    @mainLayout.show([homeView])
     null
 
   bio: ->
+    bioView = new Otalvaro.Views.Bio( model: @bioModel )
     @sliderCover.collapse()
-    @mainLayout.update(@bioView)
+    @mainLayout.show([bioView])
 
   blog: ->
+    blogView = new Otalvaro.Views.Blog
+      itemViewClass: Otalvaro.Views.BlogEntry
+      collection: @blogCollection
+      querySelector: '#blogFeed'
+
     @sliderCover.collapse()
-    @mainLayout.update(@blogView)
+    @mainLayout.show([blogView, @blogNavi])
 
   gallery: ->
+    galleryView = new Otalvaro.Views.Gallery
+      collection: @galleryCollection
+
     @sliderCover.collapse()
-    @mainLayout.update(@galleryView)
+    @mainLayout.show([galleryView, @galleryNavi])
 
   page: ->
     @sliderCover.collapse()
