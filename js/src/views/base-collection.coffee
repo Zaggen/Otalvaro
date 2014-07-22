@@ -12,7 +12,6 @@ class Otalvaro.Views.CollectionView extends Backbone.View
       itemView = new @itemViewClass( model:itemModel )
       itemView.delegateEvents()
       nodes.push itemView.render().el
-
     nodes
 
   render: (callback)=>
@@ -30,7 +29,6 @@ class Otalvaro.Views.CompositeView extends Otalvaro.Views.CollectionView
     @querySelector = options.querySelector ? 'ul'
 
   render: ->
-    console.log 'collection', @collection
     @$el.html @template()
     if _.isEmpty(@collection.models)
       console.log 'collection is empty, fetching it now'
