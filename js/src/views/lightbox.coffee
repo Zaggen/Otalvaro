@@ -6,23 +6,34 @@ Otalvaro = root.Otalvaro
 class Otalvaro.Views.Lightbox extends Backbone.View
 
   template: root.template('lightBoxTemplate')
+  className: 'lightBox hidden'
 
   events:
-    'click .overlay .closeBtn': 'hide'
+    'click .closeBtn, .overlay': 'hide'
+    'click .prevBtn': 'prev'
+    'click .nextBtn': 'next'
 
-  initialize: ->
+  initialize: (options)->
     @hideClass = 'hidden'
     @currentIndex = 0
-    $(document).on('showLightBox', @show);
+    @settings =  cycle: options.cycle ? yes
 
-  show: (e)->
+    $(document).on('showLightBox', @show);
+    if $('#lightBox')[0]?
+      @setElement('#lightBox')
+    else
+     @render()
+
+  show: (e)=>
     @currentIndex = e.modelIndex
     console.log 'showing current index:', @currentIndex
     @$el.removeClass(@hideClass)
-    @loadImage( @collection.at(@currentIndex) )
+    model = @collection.at(@currentIndex).toJSON()
+    @loadImage( model, yes )
 
   hide: ->
     @$el.addClass(@hideClass)
+    @resizeWindow(0, 0, yes)
     @$figure.empty()
 
   hideLoader: ->
@@ -34,20 +45,35 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     @$progressLoader.removeClass(@hideClass)
 
   prev: ()->
-    @loadImage( @collection.at(--@currentIndex) )
+    if @currentIndex isnt 0
+      @currentIndex--
+    else
+      if @settings.cycle
+        @currentIndex = @collection.length - 1
+
+
+    model = @collection.at(@currentIndex).toJSON()
+    @loadImage(model)
 
   next: ()->
-    @loadImage( @collection.at(++@currentIndex) )
+    if @currentIndex  < @collection.length - 1
+      @currentIndex++
+    else
+      if @settings.cycle
+        @currentIndex = 0
 
-  loadImage: (model)->
+    model = @collection.at(@currentIndex).toJSON()
+    @loadImage(model)
 
-    @$figure = @figure? @$el.find('figure')
+  loadImage: (model, addTransition = no)->
+
+    @$figure ?= @$el.find('figure')
     @showLoader()
 
     img = new Image()
     img.onload = ()=>
       @$figure.html(img)
-
+      @resizeWindow(img.width, img.height, addTransition)
       console.log 'imagen cargada'
 
     img.onerror = ()=>
@@ -55,5 +81,39 @@ class Otalvaro.Views.Lightbox extends Backbone.View
 
     img.src = model.fullImg
 
-  render: (model)->
+  resizeWindow: (width, height, addTransition = no)->
+    @$lightBoxWindow ?= @$el.find('.window')
+
+    unless @limits?
+      percentLimint = 0.8
+      @limits =
+        width : $('#lightBox').outerWidth() * percentLimint
+        height : $('#lightBox').outerHeight() * percentLimint
+
+    console.log @limits
+
+    if(width > @limits.width or height > @limits.height)
+      wMultiplier = @limits.width / width
+      hMultiplier = @limits.height / height
+      debugger
+      multiplier = if wMultiplier < hMultiplier then wMultiplier else hMultiplier
+      width *= multiplier
+      height *= multiplier
+
+    top = height / 2
+    left = width / 2
+
+    if addTransition
+      @$lightBoxWindow.addClass('transitionAll')
+    else
+      @$lightBoxWindow.removeClass('transitionAll')
+
+    @$lightBoxWindow.css
+      width: "#{width}px"
+      height: "#{height}px"
+      margin: "-#{top}px 0 0 -#{left}px"
+
+
+  render: ()->
     @$el.html @template()
+    this
