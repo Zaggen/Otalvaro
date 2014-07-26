@@ -12,14 +12,14 @@ class Otalvaro.Views.navigation extends Backbone.View
   el: '#mainNav'
 
   events:
-    'mousedown a': 'navHandler'
+    'mousedown a:not(.current_page_item)': 'navHandler'
     'click a': 'preventDefault'
     'click': 'toggleNavBar'
 
   initialize: ->
     @$navItems = @$el.find('a')
     @currentRoute = ''
-    @mobileNavStatus = 'closed'
+    @mobileClosed = yes
 
   # The actual logic fires on mousedown to save some miliseconds, but we still prevent the default click behavior
   preventDefault: (e)->
@@ -50,19 +50,19 @@ class Otalvaro.Views.navigation extends Backbone.View
       else
         index++
 
+    console.log index
     @markAsSelected $(@$navItems[index])
 
   toggleNavBar: =>
-    if @mobileNavStatus is 'closed'
+    if @mobileClosed
       @openMobileMenu()
-    else if @mobileNavStatus is 'open'
+    else
       @closeMobileMenu()
 
   openMobileMenu: ->
     @$el.addClass('openMenu')
-    @mobileNavStatus = 'open'
+    @mobileClosed = no
 
   closeMobileMenu: ->
     @$el.removeClass('openMenu')
-    @mobileNavStatus = 'closed'
-
+    @mobileClosed = yes
