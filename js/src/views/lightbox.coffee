@@ -12,23 +12,27 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     'click .prevBtn': 'prev'
     'click .nextBtn': 'next'
 
-  initialize: (options)->
+  initialize: ->
+    console.log 'a new lightbox has been instanciated', this
     @hideClass = 'hidden'
     @currentIndex = 0
+    $(document).on('showLightBox', @show)
+
+    # If the element is present on the DOM there is no need to render the view, we just attach the el to it
+    if $('#lightBox')[0]?
+      console.log "setting el to #lightBox"
+      @setElement('#lightBox')
+    else
+      @render()
+
+  set: (options)->
+    @collection = options.collection
     @settings =
       mode: options.mode ? 'images' # Could be iframes for embedded video iframes
       cycle: options.cycle ? yes
 
-    $(document).on('showLightBox', @show);
-
-    # If the element is present on the DOM there is no need to render the view, we just attach the el to it
-    if $('#lightBox')[0]?
-      @setElement('#lightBox')
+    if _.isEmpty(@collection.models)
       @populateCollection()
-    else
-     @render()
-
-    @loadContent() # Sets the method to work with images or iframes depending on the value of @settings.mode
 
   show: (e)=>
     @currentIndex = e.modelIndex
@@ -76,35 +80,52 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     @loadContent(model)
 
   loadContent: (modelObj, addTransition = no)->
-    console.log 'load content with @settings.mode ' + @settings.mode
-    @$content = @$el.find('#lightboxContent')
     if @settings.mode is 'images'
-      @loadContent = @loadImage
+      @loadImage(modelObj, addTransition)
     else # @settings.mode is 'iframe'
-      @loadContent = @loadIframe
+      @loadIframe(modelObj, addTransition)
 
   loadImage: (modelObj, addTransition = no)->
     # Loads the img as an obj, and when is fully load places it on the figure container and then
     # resizes the lightbox window
     console.log 'load image'
     @showLoader()
-
+    @$content ?= @$el.find('#lightboxContent')
+    _self = @
     img = new Image()
-    img.onload = ()=>
-      @$content.html(img)
-      @resizeWindow(img.width, img.height, addTransition)
-      @hideLoader()
-      console.log 'img loaded'
+    img.onload = ->
+      _self.$content.html(img)
+      _self.resizeWindow(img.width, img.height, addTransition)
+      _self.hideLoader()
+      console.log 'img loaded', _self
 
-    img.onerror = ()=>
+    img.onerror = ->
       console.log 'error, img not found'
 
     img.src = modelObj.fullImg
 
   loadIframe: (modelObj, addTransition = no)->
+    @$content ?= @$el.find('#lightboxContent')
     @showLoader()
-    iframe = $('<iframe />').attr('src', modelObj.embedUrl);
-    @$content.html(iframe)
+    iframeW = 600
+    iframeH = 390
+    $iframe = $('<iframe />')
+      .attr('src', modelObj.embedUrl)
+      .css
+        width:  iframeW
+        height: iframeH
+
+    @$content.html($iframe)
+    @resizeWindow(iframeW, iframeH)
+
+    # Check if iframe is already loaded, else attach @hideLoader to the load event
+    if $iframe.get(0).complete
+      @hideLoader()
+    else
+      $iframe.load =>
+        @hideLoader()
+
+
 
   resizeWindow: (width, height, addTransition = no)->
     @$lightBoxWindow ?= @$el.find('.window')
@@ -112,8 +133,8 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     unless @limits?
       percentLimint = 0.8
       @limits =
-        width : $('#lightBox').outerWidth() * percentLimint
-        height : $('#lightBox').outerHeight() * percentLimint
+        width : @$el.outerWidth() * percentLimint
+        height : @$el.outerHeight() * percentLimint
 
     console.log @limits
 
@@ -132,12 +153,15 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     else
       @$lightBoxWindow.removeClass('transitionAll')
 
+    console.log 'resizing to ' + width
+
     @$lightBoxWindow.css
       width: "#{width}px"
       height: "#{height}px"
       margin: "-#{top}px 0 0 -#{left}px"
 
   populateCollection: ->
+    console.log 'populating collection for lightbox'
     _self = @
     lightboxContentKey = if @settings.mode is 'images' then 'fullImg' else 'embedUrl'
     $('.gallery a').each ->
@@ -149,9 +173,10 @@ class Otalvaro.Views.Lightbox extends Backbone.View
 
       _self.collection.add(json)
 
+  close:->
+    $(document).off('showLightBox', @show)
+    super
 
-
-
-  render: ()->
+  render: ->
     @$el.html @template()
     this
