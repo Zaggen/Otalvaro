@@ -2,23 +2,34 @@ root = window ? global
 Otalvaro = root.Otalvaro
 
 # Contact Form View
-class Otalvaro.Views.contact extends Backbone.View
-  el: '#mainContact'
+
+class Otalvaro.Views.Contact extends Otalvaro.Views.BaseContent
+  template: root.template('contactTemplate')
 
   initialize: ->
-    @$alert =  $ @$el.parent().find('.alert')
+    super
+    if $('#contactWrapper')[0]?
+      @setElement('#contactWrapper')
+
+    @$alert =  $( @$el.find('.alert') )
 
   events:
     'submit': 'contactHandler'
 
   contactHandler: (e)=>
     e.preventDefault()
-    @sendForm @$el.serialize()
+    @$form ?= @$el.find('form')
+    @postUrl ?= @$form.attr( 'action' )
+    @sendForm( @$form.serialize() )
 
   sendForm: (data)->
+    console.log 'data', data
+    console.log '--------------'
+    console.log '@postUrl', @postUrl
+    console.log '--------------'
     $.ajax
-      type: "POST"
-      url: @$el.attr( 'action' )
+      type: 'POST'
+      url: @postUrl
       data: data
 
       success: ( response )=>
