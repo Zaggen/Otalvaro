@@ -20,6 +20,9 @@ class Otalvaro.Views.navigation extends Backbone.View
     @$navItems = @$el.find('a')
     @currentRoute = ''
     @mobileClosed = yes
+    @$parentHeader = @$el.closest('header')
+    @winW = $(window).width()
+    @widthToTriggerMobile = 834
 
   # The actual logic fires on mousedown to save some miliseconds, but we still prevent the default click behavior
   preventDefault: (e)->
@@ -54,15 +57,18 @@ class Otalvaro.Views.navigation extends Backbone.View
     @markAsSelected $(@$navItems[index])
 
   toggleNavBar: =>
-    if @mobileClosed
-      @openMobileMenu()
-    else
-      @closeMobileMenu()
+    if @winW < @widthToTriggerMobile
+      if @mobileClosed
+        @openMobileMenu()
+      else
+        @closeMobileMenu()
 
   openMobileMenu: ->
     @$el.addClass('openMenu')
+    @$parentHeader.css('position', 'absolute')
     @mobileClosed = no
 
   closeMobileMenu: ->
     @$el.removeClass('openMenu')
+    @$parentHeader.css('position', 'fixed')
     @mobileClosed = yes
