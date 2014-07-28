@@ -31,6 +31,9 @@ body {
   font-family: 'Open Sans', Helvetica, sans-serif;
   border-top: 18px solid #f7f8f2;
 }
+img {
+    max-width: 100%;
+}
 .container {
   max-width: 960px;
   width: 100%;
@@ -202,7 +205,8 @@ body {
   font-size: 0.82em;
 }
 .fadeIn,
-.fastFadeIn {
+.fastFadeIn,
+.delayedFadeIn {
   opacity: 0;
   -webkit-animation: fadeIn ease-in 1;
   -moz-animation: fadeIn ease-in 1;
@@ -220,12 +224,19 @@ body {
   -ms-animation-duration: 2s;
   animation-duration: 2s;
 }
-.fastFadeIn {
+.fastFadeIn, .delayedFadeIn {
   -webkit-animation-duration: 0.5s;
   -moz-animation-duration: 0.5s;
   -o-animation-duration: 0.5s;
   -ms-animation-duration: 0.5s;
   animation-duration: 0.5s;
+}
+
+.delayedFadeIn {
+  -webkit-animation-delay: 0.5s;
+  -moz-animation-delay: 0.5s;
+  -o-animation-delay: 0.5s;
+  animation-delay: 0.5s;
 }
 @-webkit-keyframes fadeIn {
   0% {
@@ -632,7 +643,7 @@ body {
   font-size: 1.6rem;
   color: #000;
   font-weight: normal;
-  margin: 15px 0;
+  margin: 10px 0;
   text-transform: capitalize;
 }
 .navCrumb .fa {
@@ -660,7 +671,8 @@ body {
   text-align: center;
 }
 #bioDetails .bioDetailsData {
-  padding: 0 60px;
+    padding: 0 50px;
+    text-align: left;
 }
 #bioDetails strong {
   font-weight: 600;
@@ -847,6 +859,7 @@ body {
 }
 .entryFeed .entryTitle {
   font-size: 1rem;
+  color: black;
 }
 .publishDate {
   color: #d4c2c2;
@@ -867,16 +880,42 @@ body {
   margin-right: 4px;
 }
 @media (max-width: 680px) {
+  .entryFeed {
+     padding: 2rem 0.2rem;
+     border-bottom: 1px solid rgb(227, 227, 227);
+     text-align: center;
+  }
   .entryThumb {
     float: none !important;
     opacity: 1;
-    margin: 15px auto;
+    margin: 0 auto 2rem;
   }
-  .entryFeed {
-      padding-bottom: 2rem;
-      border-bottom: 1px solid rgb(227, 227, 227);
+  .feedText {
+      text-align: justify;
   }
 }
+
+/* Single Entry Blog (Full) */
+#singleEntry .publishDate {
+    display: inline-block;
+    margin: 0 1rem 1.2rem 0;
+    font-size: 13px;
+}
+
+#singleEntry .starRating{
+    display: inline-block;
+    color: #000000;
+}
+
+#singleEntry figure {
+    margin-bottom: 1.5rem;
+}
+
+#singleEntry .featuredImg {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
 /* Footer */
 #mainFooter {
   background: #f7f8f2;
@@ -955,7 +994,6 @@ body {
 
 .lightBox {
     width: 100%;
-    width: 100%;
     height: 100%;
     position: fixed;
     top: 0;
@@ -998,6 +1036,7 @@ body {
 .hidden {
     opacity: 0!important;
     visibility: hidden!important;
+    display: none;
 }
 
 .lightBox .closeBtn {
@@ -1047,7 +1086,7 @@ body {
     top: 50%;
     margin-top: -62px;
     cursor: pointer;
-    z-index: 999;
+    z-index: 99999;
     font-size: 124px;
     color: #ff004e;
     text-shadow: 0px 0 4px rgba(0, 0, 0, 0.54);
@@ -1085,9 +1124,17 @@ body {
     margin-bottom: 15px;
 }
 
+.lightBox iframe {
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    margin: auto;
+}
+
 /**
  * (C)Leanest CSS spinner ever
  */
+
 
 @keyframes spin {
     to {
@@ -1096,7 +1143,7 @@ body {
 }
 
 .progress {
-    position: relative;
+    position: absolute;
     display: inline-block;
     width: 5em;
     height: 5em;
@@ -1105,6 +1152,9 @@ body {
     text-indent: 999em;
     overflow: hidden;
     -webkit-animation: spin 1s infinite steps(8);
+    left: 50%;
+    margin-left: -2.5em;
+    z-index: 99999;
 }
 
 .small.progress {
@@ -1149,6 +1199,119 @@ body {
     -webkit-transform: rotate(-135deg);
     background: #bbb;
 }
+
+#mainLoader {
+    top: 30%;
+    position: fixed;
+}
+
+/* CONTACT Styles */
+
+.contactInput {
+    width: 95%;
+    height: 34px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    border-radius: 2px;
+    background-color: #ebece4;
+    color: #918686;
+}
+#contactDataTitle {
+    font-size: 1.6rem;
+    color: #000;
+    font-weight: normal;
+    margin: 15px 0;
+    text-transform: capitalize;
+}
+
+#contactDetails li {
+    margin-bottom: 0.4rem;
+    color: #000000;
+}
+
+#contactMessage {
+    color: #d4c2c2;
+    line-height: 1.6rem;
+    margin-top: 0.5rem;
+}
+
+.submitBtn{
+    display: block;
+    width: 87px;
+    height: 47px;
+    padding: 2px;
+    border-radius: 3px;
+    background-color: #ff004e;
+    color: white;
+    float: right;
+    margin-right: 5%;
+}
+
+textarea.contactInput {
+    height: 275px;
+}
+
+@media (max-width: 900px){
+    #contactFormWrapper {
+        width: 50%;
+    }
+    #contactDetailsWrapper {
+        width: 50%;
+    }
+}
+
+@media (max-width: 700px){
+    .submitBtn{
+        margin-left: 0;
+        margin-right: 5%;
+        float: right;
+    }
+    #contactFormWrapper {
+        width: 100%;
+    }
+    #contactDetailsWrapper {
+        display: none;
+    }
+}
+
+#contactDetailsWrapper img {
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/*Alerts*/
+.alert, .closeAlert {
+    padding: 11px;
+    text-align: center;
+    border-radius: 4px;
+    margin: 25px auto;
+}
+
+.alertSuccess {
+    background-color: rgb(195, 255, 195);
+    border: 1px solid rgb(169, 223, 169);
+    color: rgb(68, 109, 68);
+}
+
+.alertDanger {
+    background-color: rgb(180, 0, 46);
+    border: 1px solid rgb(150, 0, 38);
+    color: rgb(29, 100, 79);
+}
+
+.closeAlertBtn {
+    background-color: #13000d;
+    width: 140px;
+    margin: 17px auto;
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, 1);
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+}
+
 
 /* Twitter Widget custom styles */
 
@@ -2841,4 +3004,36 @@ a.tweet-box-button {
     .ic-mask {
         display: none;
     }
+}
+.social-widget .hide img, .social-widget .show img {
+    display: none;
+}
+
+.social-widget .hide a, .social-widget .show a {
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid rgb(255, 0, 67);
+    display: block;
+    clear: both;
+    position: relative;
+    top: 6px;
+    left: 5px;
+    border-radius: 2px;
+}
+
+.social-widget .show a {
+    border-left: none;
+    border-right: 12px solid rgb(255, 0, 67);
+}
+
+#hideMobileBrowserBar{
+    visibility: hidden;
+    height: 0;
+    width: 0;
+    z-index: 99999999999; /* should be bigger than everything else */
+    position: fixed;
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
 }
