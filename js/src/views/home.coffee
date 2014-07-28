@@ -9,10 +9,11 @@ class Otalvaro.Views.Home extends Otalvaro.Views.BaseContent
     @inMemory = no
     @memoryRender = no
 
-  close: =>
-    unless @inMemory
+  close: ->
+    console.log 'closing home'
+    ### unless @inMemory
       @$iframe = $( $('.twitter-timeline').contents().find('body').html() )
-      @inMemory = yes
+      @inMemory = yes###
 
   render: (callback)->
     unless @memoryRender
