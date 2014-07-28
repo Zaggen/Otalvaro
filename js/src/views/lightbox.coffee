@@ -25,6 +25,12 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     else
       @render()
 
+    @resized = no
+    $(window).on('resize', _.bind( ->
+      @resized = yes
+    , this))
+    true
+
   set: (options)->
     @collection = options.collection
     @settings =
@@ -98,10 +104,17 @@ class Otalvaro.Views.Lightbox extends Backbone.View
       _self.resizeWindow(img.width, img.height, addTransition)
       _self.hideLoader()
       console.log 'img loaded', _self
+      _self.preloadNextImage()
 
     img.onerror = ->
       console.log 'error, img not found'
 
+    img.src = modelObj.fullImg
+
+  preloadNextImage: ->
+    index = @currentIndex + 1
+    modelObj = @collection.at(index).toJSON()
+    img = new Image()
     img.src = modelObj.fullImg
 
   loadIframe: (modelObj, addTransition = no)->
@@ -130,13 +143,9 @@ class Otalvaro.Views.Lightbox extends Backbone.View
   resizeWindow: (width, height, addTransition = no)->
     @$lightBoxWindow ?= @$el.find('.window')
 
-    unless @limits?
-      percentLimint = 0.8
-      @limits =
-        width : @$el.outerWidth() * percentLimint
-        height : @$el.outerHeight() * percentLimint
-
-    console.log @limits
+    if @resized or not @limits?
+      @setLimits()
+      @resized = no
 
     if(width > @limits.width or height > @limits.height)
       wMultiplier = @limits.width / width
@@ -172,6 +181,14 @@ class Otalvaro.Views.Lightbox extends Backbone.View
       json.thumbnail = $link.find('img').attr('src')
 
       _self.collection.add(json)
+
+  setLimits: =>
+    console.log 'setting limits'
+    percentLimint = 0.8
+    @limits =
+      width : @$el.outerWidth() * percentLimint
+      height : @$el.outerHeight() * percentLimint
+    console.log '@limits', @limits
 
   close:->
     $(document).off('showLightBox', @show)
