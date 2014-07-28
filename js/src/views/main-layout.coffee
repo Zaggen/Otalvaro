@@ -46,17 +46,21 @@ class Otalvaro.Views.MainLayOut extends Backbone.View
 
   showRegion: (views, region = 'main')->
     console.log 'Showing views'
+
+    # Based on the .fastFadeIn and .fastFadeOut duration, changes
+    # must be made in the css classes and here to alter the delay
+    delay = 500
     @fadeOut(region)
-    delay = 500 # Based on the .fastFadeIn and .fastFadeOut duration, changes must be made in the classes and here to alter the delay
     viewNodes = []
     for view in views
       node =  view.render().el
       viewNodes.push(node)
+
+    # We wait until the fadeOut is complete to clean the regions and append our new views
     _.delay(
       _.bind ->
         @closeOldViews(region)
-        console.log 'Done closing views, now we call html() wit the new nodes->', viewNodes
-        #@$el.html(viewNodes)
+        console.log 'Done closing views, now we call html() with the new nodes->', viewNodes
         @$regions[region].html(viewNodes)
         @fadeIn(region)
         @oldViews[region] = views
