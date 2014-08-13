@@ -4,8 +4,8 @@ Otalvaro = root.Otalvaro
 # Pagination View
 
 class Otalvaro.Views.Lightbox extends Backbone.View
-  template: root.template('lightBoxTemplate')
   className: 'lightBox hidden'
+  id: 'lightBox'
 
   events:
     'click .closeBtn, .overlay': 'hide'
@@ -16,29 +16,48 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     console.log 'a new lightbox has been instanciated', this
     @hideClass = 'hidden'
     @currentIndex = 0
-    $(document).on('showLightBox', @show)
+    $(document).on('setLightbox', @set)
+    $(document).on('showLightBox',@show)
+    @closed = yes
 
     # If the element is present on the DOM there is no need to render the view, we just attach the el to it
-    if $('#lightBox')[0]?
+    if $('#' + @id)?
       console.log "setting el to #lightBox"
-      @setElement('#lightBox')
+      @setElement('#' + @id)
     else
       @render()
 
+    @setKeyBinding()
+    @setResizeHandler()
+    this
+
+
+  setResizeHandler: ->
     @resized = no
-    $(window).on('resize', _.bind( ->
+    $(window).on 'resize', =>
       @resized = yes
-    , this))
-    true
+      if @imgSize?
+        @resizeWindow(@imgSize.width, @imgSize.height, no)
+    this
 
-  set: (options)->
-    @collection = options.collection
-    @settings =
-      mode: options.mode ? 'images' # Could be iframes for embedded video iframes
-      cycle: options.cycle ? yes
+  setKeyBinding: ->
+    $(document).keydown (e)=>
+      unless @closed
+        if(e.which is 37)
+          @prev()
+        else if(e.which is 39)
+          @next()
 
-    if _.isEmpty(@collection.models)
-      @populateCollection()
+  set: (options)=>
+    console.log 'collection about to be set'
+    unless @collection is options.collection
+      @collection = options.collection
+      @settings =
+        mode: options.mode ? 'images' # Could be iframes for embedded video iframes
+        cycle: options.cycle ? yes
+
+      if _.isEmpty(@collection.models)
+        console.warn 'Collection is empty'
 
   show: (e)=>
     @currentIndex = e.modelIndex
@@ -46,11 +65,14 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     @$el.removeClass(@hideClass)
     model = @collection.at(@currentIndex).toJSON()
     @loadContent( model, yes )
+    @closed = no
 
   hide: ->
     @$el.addClass(@hideClass)
     @resizeWindow(0, 0, yes)
     @$content.empty()
+    @imgSize = null
+    @closed = yes
 
   hideLoader: ->
     @$progressLoader ?= @$el.find('.progress')
@@ -97,22 +119,35 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     console.log 'load image'
     @showLoader()
     @$content ?= @$el.find('#lightboxContent')
-    _self = @
     img = new Image()
-    img.onload = ->
-      _self.$content.html(img)
-      _self.resizeWindow(img.width, img.height, addTransition)
-      _self.hideLoader()
-      console.log 'img loaded', _self
-      _self.preloadNextImage()
+    $img = $(img)
 
-    img.onerror = ->
+    $img.one 'load', =>
+
+      @imgSize =
+        width : img.width
+        height: img.height
+
+      @$content.html(img)
+      @resizeWindow(@imgSize.width, @imgSize.height, addTransition)
+      @hideLoader()
+      @preloadNextImage()
+
+    $img.one 'error', ->
       console.log 'error, img not found'
 
     img.src = modelObj.fullImg
 
+    # Triggers load event when the image is cached and not actually loaded from server
+    if img.complete then $img.load()
+
   preloadNextImage: ->
-    index = @currentIndex + 1
+    if @currentIndex  < @collection.length - 1
+      index = @currentIndex + 1
+    else
+      if @settings.cycle
+        index = 0
+
     modelObj = @collection.at(index).toJSON()
     img = new Image()
     img.src = modelObj.fullImg
@@ -123,8 +158,8 @@ class Otalvaro.Views.Lightbox extends Backbone.View
     iframeW = 600
     iframeH = 390
     $iframe = $('<iframe />')
-      .attr('src', modelObj.embedUrl)
-      .css
+    .attr('src', modelObj.embedUrl)
+    .css
         width:  iframeW
         height: iframeH
 
@@ -141,6 +176,7 @@ class Otalvaro.Views.Lightbox extends Backbone.View
 
 
   resizeWindow: (width, height, addTransition = no)->
+    console.log 'reziseWindow called with the following args: w:' + width + ', h:' + height
     @$lightBoxWindow ?= @$el.find('.window')
 
     if @resized or not @limits?
@@ -151,6 +187,7 @@ class Otalvaro.Views.Lightbox extends Backbone.View
       wMultiplier = @limits.width / width
       hMultiplier = @limits.height / height
       multiplier = if wMultiplier < hMultiplier then wMultiplier else hMultiplier
+      console.log 'multiplier', multiplier
       width *= multiplier
       height *= multiplier
 
@@ -169,18 +206,8 @@ class Otalvaro.Views.Lightbox extends Backbone.View
       height: "#{height}px"
       margin: "-#{top}px 0 0 -#{left}px"
 
-  populateCollection: ->
-    console.log 'populating collection for lightbox'
-    _self = @
-    lightboxContentKey = if @settings.mode is 'images' then 'fullImg' else 'embedUrl'
-    $('.gallery a').each ->
-      json = {}
-      $link = $(this)
-      json.title = $link.attr('title')
-      json[lightboxContentKey] = $link.attr('href')
-      json.thumbnail = $link.find('img').attr('src')
-
-      _self.collection.add(json)
+    @resized = no
+    this
 
   setLimits: =>
     console.log 'setting limits'
